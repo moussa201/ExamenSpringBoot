@@ -5,14 +5,20 @@ import java.util.stream.Collectors;
 
 import com.howtodoinjava.example.employee.DAO.ActeurDAO;
 import com.howtodoinjava.example.employee.DAO.FilmDAO;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.howtodoinjava.example.employee.service.filmService;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class CinemaControler {
 
     public String aide1;
+    @Autowired
+    filmService filmservice = new filmService();
+
     List<FilmDAO> acteurfilme = new ArrayList<FilmDAO>();
 
     {
@@ -27,6 +33,19 @@ public class CinemaControler {
         return acteurfilme;
     }
 
+    @ApiOperation(value = "Suppression d'une filme ", response = ActeurDAO.class, tags = "deleteFilm")
+    @DeleteMapping("/films/{titre}")
+    public void deleteFilm(@PathVariable String titre) {
+        filmservice.deleteFilm(titre);
+    }
+
+    @ApiOperation(value = "Ajout d'une film ", response = ActeurDAO.class, tags = "addedFilm")
+    @PostMapping
+    public ResponseEntity<FilmDAO> addFilm(@RequestBody FilmDAO film) {
+        FilmDAO addedFilm = filmservice.addFilm(film);
+        return ResponseEntity.status(HttpStatus.CREATED).body(addedFilm);
+    }
+
     List<ActeurDAO> acteurDAOS = new ArrayList<ActeurDAO>();
 
     {
@@ -39,8 +58,11 @@ public class CinemaControler {
         return acteurDAOS;
     }
 
+    @ApiOperation(value = "Pour avoir un filme en fonction de nom ", response = ActeurDAO.class, tags = "getActeur")
     @RequestMapping(value = "/getActeur/{nom}")
-    public ActeurDAO getStudent(@PathVariable(value = "nom") String nom) {
+    public ActeurDAO getActeur(@PathVariable(value = "nom") String nom) {
         return acteurDAOS.stream().filter(x -> x.getNom().equalsIgnoreCase(nom)).collect(Collectors.toList()).get(0);
     }
+
+
 }
